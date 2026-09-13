@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Passport Door-to-Door Reality — processing ≠ mailbox arrival</title>
+  <meta name="description" content="Paste passport application submit/mail date, routine or expedited, optional trip date, and view date. One shareable card: earliest → latest door-to-door mailbox window (processing + up to 2 weeks inbound + up to 2 weeks return). Cite travel.state.gov. Ranges only — not a delivery guarantee. Never ask for passport number.">
+  <meta name="theme-color" content="#0b0f14">
+  <meta property="og:title" content="Passport Door-to-Door Reality">
+  <meta property="og:description" content="Paste your apply/mail date — earliest/latest mailbox window. Processing times do not include mailing. Ranges only — not a delivery guarantee.">
+  <meta property="og:type" content="website">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <div class="wrap">
+    <header class="site">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true">PP</div>
+        <div>
+          <h1>Passport Door-to-Door Reality</h1>
+          <p class="tagline">Paste submit/mail date + routine/expedited + optional trip → earliest → latest <em>mailbox</em> window · share card.</p>
+        </div>
+      </div>
+      <span class="badge">Ranges only · not a guarantee</span>
+    </header>
+
+    <aside class="myth-banner" role="note">
+      <strong>Disclaimer.</strong>
+      This card is <em>timing literacy</em> —
+      <strong>not</strong> a delivery guarantee, <strong>not</strong> a status scrape, <strong>not</strong> a paid expediter upsell, and we <strong>never invent</strong> personal passport status or guarantee a date.
+      We <strong>never ask</strong> for a passport number.
+      Official ranges (travel.state.gov): <strong>Routine 4–6 weeks</strong> processing; <strong>Expedited 2–3 weeks</strong> processing — published processing times do <strong>not</strong> include mailing (up to <strong>2 weeks</strong> inbound + up to <strong>2 weeks</strong> return).
+      Urgent international travel within <strong>14 calendar days</strong> → passport agency appointment.
+      Sources:
+      <a href="https://travel.state.gov/en/passports/apply/help/processing-time.html" target="_blank" rel="noopener noreferrer">travel.state.gov processing times</a>
+      ·
+      <a href="https://travel.state.gov/en/passports/apply/get-fast.html" target="_blank" rel="noopener noreferrer">Get Your Passport Fast (May 12 2026)</a>
+      ·
+      <a href="https://passportstatus.state.gov/" target="_blank" rel="noopener noreferrer">passportstatus.state.gov</a>.
+      Ranges only — mailing varies by area.
+    </aside>
+
+    <section class="panel lookup" aria-labelledby="lookup-heading">
+      <h2 id="lookup-heading">1. Paste your application dates</h2>
+      <p class="hint">
+        User paste only — <strong>never</strong> ask for a passport number; <strong>no</strong> passportstatus scrape.
+        Empty submit or view date → honest miss (we will not invent a window).
+        Hard-avoid paid expediter affiliates — travel.state.gov + passportstatus.state.gov only.
+      </p>
+
+      <div class="field-grid four">
+        <div>
+          <label for="submitDate">Application submit / mail date</label>
+          <input id="submitDate" type="date" required />
+        </div>
+        <div>
+          <label for="service">Service</label>
+          <select id="service">
+            <option value="">— select —</option>
+            <option value="routine">Routine (4–6 weeks processing)</option>
+            <option value="expedited">Expedited (2–3 weeks processing)</option>
+          </select>
+        </div>
+        <div>
+          <label for="tripDate">Trip date (optional)</label>
+          <input id="tripDate" type="date" />
+        </div>
+        <div>
+          <label for="viewDate">View date (when you’re looking)</label>
+          <input id="viewDate" type="date" required />
+        </div>
+      </div>
+
+      <div class="field-grid" style="margin-top:0.75rem">
+        <div>
+          <label for="noteLabel">Note label (optional)</label>
+          <input id="noteLabel" type="text" maxlength="64" placeholder="e.g. Redacted · family chat" autocomplete="off" />
+        </div>
+      </div>
+
+      <div class="actions">
+        <button type="button" class="btn btn-primary" id="cardBtn">Show door-to-door window</button>
+        <button type="button" class="btn" id="clearBtn">Clear</button>
+      </div>
+      <p class="status" id="status" aria-live="polite"></p>
+
+      <h3 class="subhead">Seed examples (teaching dates)</h3>
+      <div class="seed-chips" id="seedChips" role="list" aria-label="Seed passport door-to-door examples"></div>
+    </section>
+
+    <section class="panel card-panel" aria-labelledby="card-heading" id="cardSection" hidden>
+      <div class="card-toolbar">
+        <h2 id="card-heading">2. Shareable door-to-door card</h2>
+        <div class="actions">
+          <button type="button" class="btn" id="copySummary">Copy summary</button>
+          <button type="button" class="btn" id="shareBtn">Share link</button>
+          <button type="button" class="btn" id="pngBtn">Export PNG</button>
+        </div>
+      </div>
+
+      <!-- PRIMARY VISUAL: giant earliest → latest door-to-door bar -->
+      <article class="renewal-card" id="deadlineCard" aria-labelledby="dlHeadline">
+        <header class="card-head">
+          <div>
+            <p class="brand-line">Passport Door-to-Door Reality</p>
+            <p class="meta-line" id="cardMeta">—</p>
+            <h3 id="dlHeadline">Earliest → latest mailbox window?</h3>
+          </div>
+          <div class="verdict" id="statusBadge">
+            <span class="verdict-k" id="statusPill">—</span>
+            <span class="verdict-s" id="statusSub">Text-labeled · not color-only</span>
+          </div>
+        </header>
+
+        <div class="hero-row">
+          <div class="hero-stat cy-lead">
+            <span class="hero-kicker">Door-to-door arrival window</span>
+            <div class="face-allin-line" aria-label="Earliest to latest">
+              <span class="face-was"><span class="face-was-k">Earliest</span> <span id="earliestDisp">—</span></span>
+              <span class="face-arrow" aria-hidden="true">→</span>
+              <span class="hero-value" id="latestDisp">—</span>
+            </div>
+            <span class="hero-sub" id="windowGiant">—</span>
+          </div>
+          <div class="hero-stat fee ring-stat">
+            <span class="hero-kicker">Processing vs door-to-door</span>
+            <p class="hero-sub" id="procOnlyLine" style="margin:0.35rem 0">—</p>
+            <p class="hero-sub" id="doorLine" style="margin:0">—</p>
+          </div>
+        </div>
+
+        <div class="timeline-wrap" aria-hidden="false">
+          <div class="timeline-bar" id="timelineBar" style="--pct:0"></div>
+          <p class="hero-sub" id="timelineLabel">—</p>
+        </div>
+
+        <p class="look-enroll-flag" id="actionFlag" aria-live="polite">—</p>
+
+        <p class="mail-chip" id="mailChipStrip" aria-live="polite">
+          Published processing times do not include mailing (up to 2 weeks inbound + up to 2 weeks return)
+        </p>
+
+        <p class="look-enroll-flag" id="urgentStrip" aria-live="polite">
+          Urgent travel: if you have international travel within 14 calendar days, contact / make a passport agency appointment (travel.state.gov) — do not rely on mail timing alone.
+        </p>
+
+        <p class="look-enroll-flag" id="tripConflictStrip" aria-live="polite" hidden></p>
+
+        <p class="look-enroll-flag" id="pointerStrip" aria-live="polite">
+          travel.state.gov processing times · passportstatus.state.gov — ranges only; mailing varies; not a delivery guarantee
+        </p>
+
+        <div class="receipt-strip" id="receiptStrip" aria-label="Window breakdown" style="grid-template-columns:repeat(auto-fit,minmax(140px,1fr))">
+          <div class="r-item"><span class="r-k">Submit / mail</span><span class="r-v" id="rSubmit">—</span></div>
+          <div class="r-item"><span class="r-k">Service</span><span class="r-v" id="rService">—</span></div>
+          <div class="r-item"><span class="r-k">Trip</span><span class="r-v" id="rTrip">—</span></div>
+          <div class="r-item"><span class="r-k">View date</span><span class="r-v" id="rView">—</span></div>
+          <div class="r-item"><span class="r-k">Door-to-door window</span><span class="r-v" id="rWindow">—</span></div>
+        </div>
+
+        <p class="decoder-line" id="decoderLine">—</p>
+        <p class="action-line" id="actionLine">—</p>
+        <p class="cite-line" id="citeLine">—</p>
+
+        <footer class="card-foot">
+          <span>User-pasted dates · never invent personal status · no passport number</span>
+          <span>Ranges only — not a delivery guarantee · travel.state.gov + passportstatus.state.gov only</span>
+        </footer>
+      </article>
+
+      <div class="share-box" id="shareBox" hidden>
+        <label for="shareUrl">Share URL (hash restores your pasted fields)</label>
+        <div class="row">
+          <input id="shareUrl" type="text" readonly />
+          <button type="button" class="btn" id="copyShare" style="flex:0 0 auto">Copy</button>
+        </div>
+        <p class="hint">Append UTM when you post, e.g. <code>?utm_source=reddit&amp;utm_medium=organic&amp;utm_campaign=passport_door_to_door_mvp</code></p>
+      </div>
+
+      <div class="source-links" id="sourceLinks"></div>
+    </section>
+
+    <section class="panel legend" aria-labelledby="legend-heading">
+      <h2 id="legend-heading">How to read the card</h2>
+      <ul class="legend-list">
+        <li><span class="pill allin">Giant window</span> Text-primary (not color-only): <strong>earliest → latest</strong> door-to-door mailbox arrival (processing + up to 2+2 weeks mail).</li>
+        <li><span class="pill fee">Mail chip</span> Published processing times do <strong>not</strong> include mailing.</li>
+        <li><span class="pill claim">Official ranges</span> Routine <strong>4–6 weeks</strong> processing; Expedited <strong>2–3 weeks</strong> processing (travel.state.gov).</li>
+        <li><strong>Urgent strip</strong> International travel within <strong>14 calendar days</strong> → passport agency appointment.</li>
+        <li><strong>Trip chip</strong> Optional Likely / Tight / Unlikely vs trip — literacy only, <strong>not</strong> a guarantee.</li>
+        <li><strong>No invented status.</strong> Empty submit/view = honest miss. Never ask passport number. No expediter affiliates.</li>
+      </ul>
+    </section>
+
+    <div class="ad-slot" aria-hidden="true">
+      <span class="ad-label">Ad slot (placeholder — AdSense later)</span>
+      <p>Inventory under the card + “why passport processing time is not door-to-door time” explainer · brand-safe display only · never inside PNG · ranges only · hard-avoid paid expediter affiliates · travel.state.gov + passportstatus.state.gov only</p>
+    </div>
+
+    <footer>
+      <strong>Passport Door-to-Door Reality</strong> — processing-vs-mailbox-honest share card from official State Dept windows.
+      <ul>
+        <li>Submit/mail date · routine/expedited · optional trip · view date → door-to-door window card</li>
+        <li>User paste only · zero status scrape · never invent personal status · ranges only — not a delivery guarantee</li>
+        <li>Free utility · ad-supported path (see README) · no paid expediter affiliates</li>
+      </ul>
+    </footer>
+    <canvas id="pngCanvas" width="900" height="1280" hidden aria-hidden="true"></canvas>
+  </div>
+</body>
+</html>
